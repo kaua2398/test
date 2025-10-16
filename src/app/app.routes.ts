@@ -54,15 +54,13 @@ export const routes: Routes = [
     path: 'ver-mais/:id',
     loadComponent: () => VerMais,
     canActivate: [authGuard],
-    data: { roles: ['Administrador', 'Normal'] },
-    renderMode: 'server'   // ✅ evita o erro de prerender
+    data: { roles: ['Administrador', 'Normal'] }
   },
   {
     path: 'editar-demanda/:id',
     loadComponent: () => CadastroAtualizacao,
     canActivate: [authGuard],
-    data: { roles: ['Normal'] },
-    renderMode: 'server'   // ✅ idem
+    data: { roles: ['Normal'] }
   },
   {
     path: 'dashboard',
@@ -78,4 +76,3 @@ export const routes: Routes = [
 ];
 
 export default routes;
-
