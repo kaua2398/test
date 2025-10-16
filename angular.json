@@ -50,14 +50,7 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all",
-              "prerender": {
-                "discoverRoutes": true,
-                "routesToIgnore": [
-                  "/ver-mais",
-                  "/editar-demanda"
-                ]
-              }
+              "outputHashing": "all"
             },
             "development": {
               "optimization": false,
