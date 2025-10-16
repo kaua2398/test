@@ -37,7 +37,7 @@ export const routes: Routes = [
     loadComponent: () => VerifyEmail,
     canActivate: [publicGuard]
   },
-  // Rotas Protegidas (precisam de login)
+  // Rotas protegidas
   {
     path: 'demandas',
     loadComponent: () => Demandas,
@@ -52,15 +52,17 @@ export const routes: Routes = [
   },
   {
     path: 'ver-mais/:id',
-    component: VerMais,
+    loadComponent: () => VerMais,
     canActivate: [authGuard],
     data: { roles: ['Administrador', 'Normal'] },
+    renderMode: 'server'   // ✅ evita o erro de prerender
   },
   {
     path: 'editar-demanda/:id',
     loadComponent: () => CadastroAtualizacao,
     canActivate: [authGuard],
-    data: { roles: ['Normal'] }
+    data: { roles: ['Normal'] },
+    renderMode: 'server'   // ✅ idem
   },
   {
     path: 'dashboard',
@@ -74,4 +76,6 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
 ];
+
+export default routes;
 
