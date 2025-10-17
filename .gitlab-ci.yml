@@ -31,7 +31,4 @@ deploy:
   image: cdrx/rancher-gitlab-deploy
   script:
     # Comando de upgrade com os nomes corretos do Rancher, retirados da sua imagem
-    - upgrade --environment "Default" \
-              --stack "Controle-Demandas" \
-              --service "timesheet-frontend" \
-              --new-image "$REGISTRY_ADDRESS/$IMAGE_NAME:latest"
+    - upgrade --environment "Default" --stack "Controle-Demandas" --service "timesheet-frontend" --new-image "$REGISTRY_ADDRESS/$IMAGE_NAME:latest"
