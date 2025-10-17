@@ -1,0 +1,44 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  # Nome da imagem Docker para a aplicação frontend
+  IMAGE_NAME: timesheet-valeshop
+
+stages:
+  - build
+  - deploy
+
+build:
+  image: docker:24.0.9
+  services:
+    - name: docker:24.0.9-dind
+  stage: build
+  only:
+    - main # Executa este job apenas para a branch main
+  script:
+    # NOTA: A linha abaixo pode ser específica para o seu ambiente de runner do GitLab.
+    # Se o runner não conseguir resolver o endereço do registry, pode ser necessário ajustar o DNS.
+    - echo "nameserver 192.168.1.8" | tee /etc/resolv.conf
+
+    # Login no registry Docker. As variáveis (REGISTRY_ADDRESS, etc.)
+    # devem ser configuradas no seu GitLab em CI/CD > Variables.
+    - echo "Realizando login no registry Docker em $REGISTRY_ADDRESS..."
+    - docker login "$REGISTRY_ADDRESS" --username "$REGISTRY_USERNAME" --password "$REGISTRY_PASSWORD"
+
+    # Build da imagem Docker usando o Dockerfile do projeto.
+    - echo "Construindo a imagem Docker: $REGISTRY_ADDRESS/$IMAGE_NAME:latest"
+    - docker build -t "$REGISTRY_ADDRESS/$IMAGE_NAME:latest" .
+
+    # Push da imagem para o registry.
+    - echo "Enviando a imagem para o registry..."
+    - docker push "$REGISTRY_ADDRESS/$IMAGE_NAME:latest"
+
+deploy:
+  stage: deploy
+  only:
+    - main # Executa este job apenas para a branch main
+  image: cdrx/rancher-gitlab-deploy # Imagem para fazer deploy no Rancher
+  script:
+    # Realiza o upgrade do serviço no Rancher com a nova imagem.
+    # ATENÇÃO: Verifique se os nomes do 'stack' e 'service' correspondem
+    # à sua configuração no Rancher.
+    - upgrade --environment "Default" --stack "Controle-Demandas" --service "timesheet-frontend" --new-image "$REGISTRY_ADDRESS/$IMAGE_NAME:latest"
