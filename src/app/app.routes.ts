@@ -10,6 +10,7 @@ import { publicGuard } from './guards/public.guard';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { ResendVerification } from './pages/resend-verification/resend-verification';
 import { VerifyEmail } from './pages/verify-email/verify-email';
+import { ResetPassword } from './pages/reset-password/reset-password';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,11 @@ export const routes: Routes = [
   {
     path: 'forgot-password',
     loadComponent: () => ForgotPassword,
+    canActivate: [publicGuard]
+  },
+  {
+    path: 'reset-password', 
+    loadComponent: () => ResetPassword,
     canActivate: [publicGuard]
   },
   {
