@@ -100,8 +100,6 @@ export class Dashboard implements OnInit, OnDestroy, AfterViewInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.toastr.error('Erro ao carregar os dados do dashboard.', 'Erro');
-        console.error(err);
         this.cdr.detectChanges();
       }
     });

@@ -79,12 +79,6 @@ export class Demandas implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        if (err.status !== 401 && err.error?.message !== 'Token inválido') {
-          this.toastr.error(
-            'Erro ao carregar as demandas. Tente novamente mais tarde.',
-            'Erro'
-          );
-        }
         this.isLoading = false;
         this.cdr.detectChanges();
       },
