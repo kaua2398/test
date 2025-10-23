@@ -15,7 +15,7 @@ import { ResetPassword } from './pages/reset-password/reset-password';
 export const routes: Routes = [
   {
     path: 'login',
-    loadComponent: () => Login,
+    loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent),
     canActivate: [publicGuard]
   },
   {
