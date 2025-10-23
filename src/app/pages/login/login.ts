@@ -57,5 +57,24 @@ export class Login {
       }
     });
   }
-}
 
+  loginWithMicrosoft(): void {
+    this.authService.loginWithMicrosoft();
+  }
+
+  private handleMicrosoftLoginCallback(event: MessageEvent): void {
+    const data = event.data;
+
+    if (data && data.success && data.userResponseDTO) {
+      setTimeout(() => {
+        if (data.userResponseDTO.userType?.toLowerCase() === 'administrador') {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.router.navigate(['/demandas']);
+        }
+      }, 0);
+    } else if (data && !data.success) {
+      this.errorMessage = data.message || 'Falha no login com Microsoft.';
+    }
+  }
+}

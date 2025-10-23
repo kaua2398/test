@@ -1,8 +1,8 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,6 @@ export class PainelService {
 
   private apiUrl = environment.apiUrl;
 
-  // Lazy load AuthService to break circular dependency
   private _authService: AuthService | undefined;
   private get authService(): AuthService {
     if (!this._authService) {
@@ -56,7 +55,7 @@ export class PainelService {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/users/profile`, { headers });
   }
-  
+
   getAllUsers(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/users/all`, { headers });
@@ -120,4 +119,3 @@ export class PainelService {
   }
 }
 
-  

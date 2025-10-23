@@ -95,4 +95,52 @@
       }
     }
   }
+
+  // Estilos adicionados para o divisor e o botão Microsoft
+  .divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #888;
+    display: flex;
+    align-items: center;
+
+    &::before, &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #ccc;
+    }
+
+    span {
+      padding: 0 1rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  .btn-microsoft {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.7rem;
+    background-color: #FFFFFF;
+    color: #5E5E5E;
+    border: 1px solid #8C8C8C;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border-radius: 30px; // Mantendo o mesmo border-radius
+    margin-bottom: 1rem; // Adicionado para espaçamento antes do link de registro
+
+    .microsoft-logo {
+      margin-right: 0.75rem;
+      width: 21px;
+      height: 21px;
+    }
+
+    &:hover {
+      background-color: #F2F2F2;
+      border-color: #5E5E5E;
+    }
+  }
 }

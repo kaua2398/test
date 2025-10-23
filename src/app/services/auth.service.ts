@@ -1,9 +1,10 @@
 import { Injectable, PLATFORM_ID, inject, Injector } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { PainelService } from './painel.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,14 +12,13 @@ import { PainelService } from './painel.service';
 export class AuthService {
   private platformId = inject(PLATFORM_ID);
   private userSubject = new BehaviorSubject<any | null | undefined>(undefined);
-
+  private apiUrl = environment.apiUrl
   user$ = this.userSubject.asObservable();
   isLoggedIn$: Observable<boolean> = this.user$.pipe(map(user => !!user));
   isAdmin$: Observable<boolean> = this.user$.pipe(
     map(user => user?.userType?.toLowerCase() === 'administrador')
   );
 
-  // Lazy load PainelService to break circular dependency
   private _painelService: PainelService | undefined;
   private get painelService(): PainelService {
     if (!this._painelService) {
@@ -39,7 +39,7 @@ export class AuthService {
       this.userSubject.next(null);
       return;
     }
-    
+
     let user = localStorage.getItem('user');
     let token = localStorage.getItem('token');
 
@@ -72,10 +72,8 @@ export class AuthService {
         const user = response.userResponseDTO;
         const token = response.token;
 
-        // Choose storage based on "remember me" flag
         const storage = credentials.rememberMe ? localStorage : sessionStorage;
-        
-        // Clear both storages first to ensure no old data remains
+
         this.clearStorage();
 
         storage.setItem('user', JSON.stringify(user));
@@ -90,13 +88,30 @@ export class AuthService {
     );
   }
 
+  loginWithMicrosoft(): void {
+    const backendMicrosoftLoginUrl = `${this.apiUrl}/users/auth/microsoft`;
+    const width = 500;
+    const height = 600;
+    const top = (window.screen.height - height) / 2;
+    const left = (window.screen.width - width) / 2;
+
+    // Abre a pop-up
+    window.open(
+      backendMicrosoftLoginUrl,
+      'MicrosoftLogin',
+      `width=${width},height=${height},top=${top},left=${left},toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes`
+    );
+  }
+
+  
+
   resendVerifyEmail(email: string): Observable<any> {
     return this.painelService.resendVerifyEmail({ email });
   }
 
   verifyEmail(token: string): Observable<any> {
     return this.painelService.verifyEmail(token);
-  } 
+  }
 
   forgotPassword(email: string): Observable<any> {
     return this.painelService.forgotPassword({ email });
@@ -116,17 +131,17 @@ export class AuthService {
   }
 
   private clearStorage(): void {
-    if(isPlatformBrowser(this.platformId)) {
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('token');
     }
   }
 
   isLoggedIn(): boolean {
-    if(isPlatformBrowser(this.platformId)) {
-        return !!this.getToken();
+    if (isPlatformBrowser(this.platformId)) {
+      return !!this.getToken();
     }
     return false;
   }
