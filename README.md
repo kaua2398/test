@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # TimesheetValeshop
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.2.
@@ -59,6 +60,8 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 =======
+=======
+>>>>>>> 8bc8e432b7bfcc4485e96709b9291291da5aa595
 # Front-End
 
 
@@ -152,4 +155,7 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+<<<<<<< HEAD
 >>>>>>> 72f316c6213207702b095c6b0f8805ac7fc85e9d
+=======
+>>>>>>> 8bc8e432b7bfcc4485e96709b9291291da5aa595
