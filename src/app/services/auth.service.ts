@@ -95,15 +95,12 @@ export class AuthService {
     const top = (window.screen.height - height) / 2;
     const left = (window.screen.width - width) / 2;
 
-    // Abre a pop-up
     window.open(
       backendMicrosoftLoginUrl,
       'MicrosoftLogin',
       `width=${width},height=${height},top=${top},left=${left},toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes`
     );
   }
-
-  
 
   resendVerifyEmail(email: string): Observable<any> {
     return this.painelService.resendVerifyEmail({ email });

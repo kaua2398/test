@@ -11,6 +11,7 @@ import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { ResendVerification } from './pages/resend-verification/resend-verification';
 import { VerifyEmail } from './pages/verify-email/verify-email';
 import { ResetPassword } from './pages/reset-password/reset-password';
+import { Callback } from './pages/callback/callback';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,11 @@ export const routes: Routes = [
   {
     path: 'verify-email',
     loadComponent: () => VerifyEmail,
+    canActivate: [publicGuard]
+  },
+  {
+    path: 'callback',
+    loadComponent: () => Callback,
     canActivate: [publicGuard]
   },
   // Rotas Protegidas (precisam de login)

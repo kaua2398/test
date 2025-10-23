@@ -62,7 +62,7 @@ export class Login {
     this.authService.loginWithMicrosoft();
   }
 
-  private handleMicrosoftLoginCallback(event: MessageEvent): void {
+  public handleMicrosoftLoginCallback(event: MessageEvent): void {
     const data = event.data;
 
     if (data && data.success && data.userResponseDTO) {
