@@ -1,29 +1,59 @@
 <app-auth-layout>
   <div class="login-form">
     <h2>Login</h2>
+
     <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
       <label>Email</label>
-      <input type="email" placeholder="Digite seu email aqui" [(ngModel)]="credentials.email" name="email" required>
+      <input
+        type="email"
+        placeholder="Digite seu email aqui"
+        [(ngModel)]="credentials.email"
+        name="email"
+        required
+      />
 
       <label>Senha</label>
-      <input type="password" placeholder="Digite sua senha aqui" [(ngModel)]="credentials.password" name="password"
-        required>
+      <input
+        type="password"
+        placeholder="Digite sua senha aqui"
+        [(ngModel)]="credentials.password"
+        name="password"
+        required
+      />
 
       <div class="options">
         <label class="remember-me">
-          <input type="checkbox" [(ngModel)]="credentials.rememberMe" name="rememberMe" /> Lembrar de mim
+          <input
+            type="checkbox"
+            [(ngModel)]="credentials.rememberMe"
+            name="rememberMe"
+          />
+          Lembrar de mim
         </label>
-        <a routerLink="/forgot-password" class="passforgot-link">Esqueceu a senha?</a>
+        <a routerLink="/forgot-password" class="passforgot-link">
+          Esqueceu a senha?
+        </a>
       </div>
 
       @if (errorMessage) {
-      <div class="error-message">{{ errorMessage }}</div>
+        <div class="error-message">{{ errorMessage }}</div>
       }
 
-      <button type="submit">ENTRAR</button>
+      <button type="submit" class="btn-login">ENTRAR</button>
     </form>
+
+    <div class="divider">
+      <span>ou</span>
+    </div>
+
+    <button class="btn-microsoft" (click)="loginWithMicrosoft()">
+      <img src="assets/microsoft-logo.svg" alt="Microsoft" />
+      Entrar com Microsoft
+    </button>
+
     <p class="register-link">
-      Ainda não tem uma conta? <a routerLink="/register">Cadastre-se!</a>
+      Ainda não tem uma conta?
+      <a routerLink="/register">Cadastre-se!</a>
     </p>
   </div>
 </app-auth-layout>

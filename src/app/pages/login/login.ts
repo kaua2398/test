@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthLayout } from '../../components/auth-layout/auth-layout';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -17,18 +18,19 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
 })
-export class Login {
+export class LoginComponent {
   credentials = {
     email: '',
     password: '',
     rememberMe: false
   };
+
   errorMessage: string | null = null;
 
   constructor(
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {}
 
   onSubmit(): void {
     if (!this.credentials.email || !this.credentials.password) {
@@ -40,7 +42,8 @@ export class Login {
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
         setTimeout(() => {
-          if (response.userResponseDTO.userType?.toLowerCase() === 'administrador') {
+          const userType = response.userResponseDTO.userType?.toLowerCase();
+          if (userType === 'administrador') {
             this.router.navigate(['/dashboard']);
           } else {
             this.router.navigate(['/demandas']);
@@ -49,13 +52,16 @@ export class Login {
       },
       error: (err) => {
         console.log(err);
-        if (err.error?.message === "Usuário desabilitado") {
-          this.errorMessage = 'Sua conta está desabilitada. Por favor, verifique seu e-mail para mais informações.';
+        if (err.error?.message === 'Usuário desabilitado') {
+          this.errorMessage = 'Sua conta está desabilitada. Verifique seu e-mail para mais informações.';
           return;
         }
         this.errorMessage = 'Email ou senha inválidos. Por favor, tente novamente.';
       }
     });
   }
-}
 
+  loginWithMicrosoft() {
+    window.location.href = environment.oauthUrl;
+  }
+}
