@@ -54,7 +54,6 @@ export class CadastroAtualizacao implements OnInit {
     this.painelService.getDemandById(id).subscribe({
       next: (data) => {
         if (data.date) {
-          // Formata a data para o formato YYYY-MM-DD que o input[type=date] espera
           data.date = new Date(data.date).toISOString().split('T')[0];
         }
         this.demanda = data;
@@ -84,6 +83,7 @@ export class CadastroAtualizacao implements OnInit {
         }
       });
     } else {
+      console.log("Enviando payload para registro: ", payload);
       this.painelService.registerDemand(payload).subscribe({
         next: () => {
           this.toastr.success('Demanda cadastrada com sucesso!', 'Sucesso!');

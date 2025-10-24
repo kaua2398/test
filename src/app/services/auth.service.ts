@@ -89,6 +89,7 @@ export class AuthService {
     if (!isPlatformBrowser(this.platformId)) {
       return null;
     }
+    console.log("Recuperando token de storage: " + (localStorage.getItem('token') || sessionStorage.getItem('token')));
     return localStorage.getItem('token') || sessionStorage.getItem('token');
   }
 
