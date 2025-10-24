@@ -25,7 +25,6 @@ export class Login implements OnInit, OnDestroy {
     rememberMe: false
   };
   errorMessage: string | null = null;
-
   backendMicrosoftLoginUrl = `${environment.apiUrl}/auth/microsoft`; 
 
   private messageListener: ((event: MessageEvent) => void) | null = null;
