@@ -1,9 +1,9 @@
 import { Injectable, PLATFORM_ID, inject, Injector, Inject } from '@angular/core';
-import { isPlatformBrowser, CommonModule } from '@angular/common'; // Importar isPlatformBrowser
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
-import { PainelService } from './painel.service'; // Assumindo que PainelService está aqui
+import { PainelService } from './painel.service'; 
 
 interface UserProfile {
   id: number;
@@ -21,10 +21,10 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private userSubject = new BehaviorSubject<UserProfile | null | undefined>(undefined); // undefined indica estado inicial (não carregado)
+  private userSubject = new BehaviorSubject<UserProfile | null | undefined>(undefined);
 
-  user$ = this.userSubject.asObservable(); // Observable para o usuário atual
-  isLoggedIn$: Observable<boolean> = this.user$.pipe(map(user => !!user)); // True se user não for null/undefined
+  user$ = this.userSubject.asObservable(); 
+  isLoggedIn$: Observable<boolean> = this.user$.pipe(map(user => !!user)); 
   isAdmin$: Observable<boolean> = this.user$.pipe(
     map(user => user?.userType?.toLowerCase() === 'administrador')
   );
@@ -104,13 +104,10 @@ export class AuthService {
     );
   }
 
-  // Método centralizado para processar a resposta de login (seja padrão ou OAuth)
   processLoginResponse(response: LoginResponse | any, rememberMe: boolean): void {
-     // Aceita a resposta direta do callback também, que pode ter o token no nível raiz
     const user = response?.userResponseDTO;
     const token = response?.token || response; // Aceita token aninhado ou no raiz
 
-    // Validação básica dos dados recebidos
     if (!user || typeof user !== 'object' || !token || typeof token !== 'string') {
         console.error("Dados de login inválidos recebidos:", response);
         this.handleLoginError("Resposta de login inválida do servidor.");
@@ -159,7 +156,6 @@ export class AuthService {
     return this.painelService.registerUser(registerData);
   }
 
-  // Método de logout
   logout(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
@@ -180,8 +176,8 @@ export class AuthService {
 
    private handleLoginError(error: any): void {
       console.error("Erro de autenticação:", error);
-      this.clearStorage(); // Garante que nenhum dado inválido permaneça
-      this.userSubject.next(null); // Define estado como não logado
+      this.clearStorage(); 
+      this.userSubject.next(null); 
    }
 
   isLoggedIn(): boolean {
