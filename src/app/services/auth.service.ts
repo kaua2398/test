@@ -27,6 +27,8 @@ export class AuthService {
     return this._painelService;
   }
 
+  private errorMessageSubject = new BehaviorSubject<string>('');
+  errorMessage$ = this.errorMessageSubject.asObservable();
   public errorMessage: string = '';
 
   constructor(
@@ -107,10 +109,9 @@ export class AuthService {
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.message) {
         // Exibe mensagem de ativação pendente
-        this.errorMessage = event.data.message;
+        this.errorMessageSubject.next(event.data.message);
       }
       if (event.data && event.data.token) {
-        // login bem-sucedido, salve token e redirecione
         localStorage.setItem('token', event.data.token);
         // ...salve user, redirecione, etc...
       }

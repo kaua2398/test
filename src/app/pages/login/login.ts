@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -17,7 +17,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
 })
-export class Login {
+export class Login implements OnInit {
   credentials = {
     email: '',
     password: '',
@@ -29,6 +29,14 @@ export class Login {
     private authService: AuthService,
     private router: Router
   ) { }
+
+  ngOnInit(): void {
+    this.authService.errorMessage$.subscribe(msg => {
+      if (msg) {
+        this.errorMessage = msg;
+      }
+    });
+  }
 
   onSubmit(): void {
     if (!this.credentials.email || !this.credentials.password) {
@@ -60,18 +68,7 @@ export class Login {
 
   loginWithMicrosoft(): void {
     this.authService.loginWithMicrosoft();
-    window.addEventListener('message', (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return;
-      if (event.data && event.data.message) {
-        this.errorMessage = event.data.message;
-      }
-      if (event.data && event.data.token) {
-        // login bem-sucedido, salve token e redirecione
-        localStorage.setItem('token', event.data.token);
-        // ...salve user, redirecione, etc...
-        this.router.navigate(['/demandas']);
-      }
-    }, { once: true });
+    // Removido o window.addEventListener, pois agora o serviço já emite a mensagem
   }
 
   public handleMicrosoftLoginCallback(event: MessageEvent): void {
