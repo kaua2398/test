@@ -37,6 +37,10 @@ export class AuthService {
     return this._painelService;
   }
 
+  private errorMessageSubject = new BehaviorSubject<string>('');
+  errorMessage$ = this.errorMessageSubject.asObservable();
+  public errorMessage: string = '';
+
   constructor(
     private router: Router,
     private injector: Injector,
