@@ -60,6 +60,18 @@ export class Login {
 
   loginWithMicrosoft(): void {
     this.authService.loginWithMicrosoft();
+    window.addEventListener('message', (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.message) {
+        this.errorMessage = event.data.message;
+      }
+      if (event.data && event.data.token) {
+        // login bem-sucedido, salve token e redirecione
+        localStorage.setItem('token', event.data.token);
+        // ...salve user, redirecione, etc...
+        this.router.navigate(['/demandas']);
+      }
+    }, { once: true });
   }
 
   public handleMicrosoftLoginCallback(event: MessageEvent): void {

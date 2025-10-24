@@ -95,11 +95,24 @@ export class AuthService {
     const top = (window.screen.height - height) / 2;
     const left = (window.screen.width - width) / 2;
 
-    window.open(
+    const popup = window.open(
       backendMicrosoftLoginUrl,
       'MicrosoftLogin',
       `width=${width},height=${height},top=${top},left=${left},toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes`
     );
+
+    window.addEventListener('message', (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.message) {
+        // Exibe mensagem de ativação pendente
+        this.errorMessage = event.data.message;
+      }
+      if (event.data && event.data.token) {
+        // login bem-sucedido, salve token e redirecione
+        localStorage.setItem('token', event.data.token);
+        // ...salve user, redirecione, etc...
+      }
+    }, { once: true });
   }
 
   resendVerifyEmail(email: string): Observable<any> {
