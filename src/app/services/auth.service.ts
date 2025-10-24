@@ -27,6 +27,8 @@ export class AuthService {
     return this._painelService;
   }
 
+  public errorMessage: string = '';
+
   constructor(
     private router: Router,
     private injector: Injector
