@@ -1,20 +1,30 @@
-import { Injectable, PLATFORM_ID, inject, Injector } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject, Injector, Inject } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common'; // Importar isPlatformBrowser
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
-import { PainelService } from './painel.service';
-import { environment } from '../../environments/environment';
+import { PainelService } from './painel.service'; // Assumindo que PainelService está aqui
+
+interface UserProfile {
+  id: number;
+  email: string;
+  userType: 'Administrador' | 'Normal' | string; 
+}
+
+interface LoginResponse {
+  token: string;
+  userResponseDTO: UserProfile;
+}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private platformId = inject(PLATFORM_ID);
-  private userSubject = new BehaviorSubject<any | null | undefined>(undefined);
-  private apiUrl = environment.apiUrl
-  user$ = this.userSubject.asObservable();
-  isLoggedIn$: Observable<boolean> = this.user$.pipe(map(user => !!user));
+  private userSubject = new BehaviorSubject<UserProfile | null | undefined>(undefined); // undefined indica estado inicial (não carregado)
+
+  user$ = this.userSubject.asObservable(); // Observable para o usuário atual
+  isLoggedIn$: Observable<boolean> = this.user$.pipe(map(user => !!user)); // True se user não for null/undefined
   isAdmin$: Observable<boolean> = this.user$.pipe(
     map(user => user?.userType?.toLowerCase() === 'administrador')
   );
@@ -29,9 +39,10 @@ export class AuthService {
 
   constructor(
     private router: Router,
-    private injector: Injector
+    private injector: Injector,
+    @Inject(PLATFORM_ID) private platformId: Object 
   ) {
-    this.loadUserFromStorage();
+    this.loadUserFromStorage(); 
   }
 
   private loadUserFromStorage(): void {
@@ -40,23 +51,34 @@ export class AuthService {
       return;
     }
 
-    let user = localStorage.getItem('user');
-    let token = localStorage.getItem('token');
+    let userJson: string | null = null;
+    let token: string | null = null;
 
-    if (!user || !token) {
-      user = sessionStorage.getItem('user');
-      token = sessionStorage.getItem('token');
-    }
+    try {
+      userJson = localStorage.getItem('user');
+      token = localStorage.getItem('token');
 
-    if (user && token) {
-      this.userSubject.next(JSON.parse(user));
-    } else {
-      this.userSubject.next(null);
+      if (!userJson || !token) {
+        userJson = sessionStorage.getItem('user');
+        token = sessionStorage.getItem('token');
+      }
+
+      if (userJson && token) {
+        const user: UserProfile = JSON.parse(userJson);
+        this.userSubject.next(user);
+      } else {
+        this.userSubject.next(null);
+      }
+    } catch (error) {
+        console.error("Erro ao carregar usuário do storage:", error);
+        this.clearStorage(); 
+        this.userSubject.next(null);
     }
   }
 
-  getCurrentUser(): any {
-    return this.userSubject.getValue();
+  getCurrentUser(): UserProfile | null {
+    const currentUser = this.userSubject.getValue();
+    return currentUser === undefined ? null : currentUser;
   }
 
   getToken(): string | null {
@@ -66,13 +88,38 @@ export class AuthService {
     return localStorage.getItem('token') || sessionStorage.getItem('token');
   }
 
-  login(credentials: { email: string, password: string, rememberMe: boolean }): Observable<any> {
+  login(credentials: { email: string, password: string, rememberMe: boolean }): Observable<LoginResponse> {
     return this.painelService.login(credentials).pipe(
-      tap((response: any) => {
-        const user = response.userResponseDTO;
-        const token = response.token;
+      tap((response: LoginResponse) => {
+        this.processLoginResponse(response, credentials.rememberMe);
+      }),
+      catchError(err => {
+        this.handleLoginError(err);
+        throw err;
+      })
+    );
+  }
 
-        const storage = credentials.rememberMe ? localStorage : sessionStorage;
+  // Método centralizado para processar a resposta de login (seja padrão ou OAuth)
+  processLoginResponse(response: LoginResponse | any, rememberMe: boolean): void {
+     // Aceita a resposta direta do callback também, que pode ter o token no nível raiz
+    const user = response?.userResponseDTO;
+    const token = response?.token || response; // Aceita token aninhado ou no raiz
+
+    // Validação básica dos dados recebidos
+    if (!user || typeof user !== 'object' || !token || typeof token !== 'string') {
+        console.error("Dados de login inválidos recebidos:", response);
+        this.handleLoginError("Resposta de login inválida do servidor.");
+        return; // Interrompe se os dados essenciais estiverem faltando
+    }
+
+    if (!isPlatformBrowser(this.platformId)) {
+        console.warn("Tentativa de processar login fora do browser.");
+        return; 
+    }
+
+    try {
+        const storage = rememberMe ? localStorage : sessionStorage;
 
         this.clearStorage();
 
@@ -80,26 +127,12 @@ export class AuthService {
         storage.setItem('token', token);
 
         this.userSubject.next(user);
-      }),
-      catchError(err => {
-        this.clearStorage();
-        throw err;
-      })
-    );
-  }
 
-  loginWithMicrosoft(): void {
-    const backendMicrosoftLoginUrl = `${this.apiUrl}/users/auth/microsoft`;
-    const width = 500;
-    const height = 600;
-    const top = (window.screen.height - height) / 2;
-    const left = (window.screen.width - width) / 2;
 
-    window.open(
-      backendMicrosoftLoginUrl,
-      'MicrosoftLogin',
-      `width=${width},height=${height},top=${top},left=${left},toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes`
-    );
+    } catch (error) {
+        console.error("Erro ao processar e armazenar dados de login:", error);
+        this.handleLoginError("Erro ao salvar informações de login.");
+    }
   }
 
   resendVerifyEmail(email: string): Observable<any> {
@@ -113,18 +146,23 @@ export class AuthService {
   forgotPassword(email: string): Observable<any> {
     return this.painelService.forgotPassword({ email });
   }
+
   register(credentials: { email: string, password: string }): Observable<any> {
     const registerData = {
       ...credentials,
-      userType: 'Normal'
+      userType: 'Normal' 
     };
     return this.painelService.registerUser(registerData);
   }
 
+  // Método de logout
   logout(): void {
-    this.clearStorage();
-    this.userSubject.next(null);
-    this.router.navigate(['/login']);
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    this.clearStorage(); 
+    this.userSubject.next(null); 
+    this.router.navigate(['/login']); 
   }
 
   private clearStorage(): void {
@@ -136,12 +174,14 @@ export class AuthService {
     }
   }
 
-  isLoggedIn(): boolean {
-    if (isPlatformBrowser(this.platformId)) {
-      return !!this.getToken();
-    }
-    return false;
-  }
+   private handleLoginError(error: any): void {
+      console.error("Erro de autenticação:", error);
+      this.clearStorage(); // Garante que nenhum dado inválido permaneça
+      this.userSubject.next(null); // Define estado como não logado
+   }
 
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
 }
 
