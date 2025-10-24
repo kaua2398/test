@@ -17,7 +17,9 @@
       </div>
 
       @if (errorMessage) {
-      <div class="error-message">{{ errorMessage }}</div>
+      <div [ngClass]="{'error-message': messageType === 'error', 'success-message': messageType === 'success'}">
+        {{ errorMessage }}
+      </div>
       }
 
       <button type="submit">ENTRAR</button>

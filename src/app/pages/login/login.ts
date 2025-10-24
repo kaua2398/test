@@ -24,6 +24,7 @@ export class Login implements OnInit {
     rememberMe: false
   };
   errorMessage: string | null = null;
+  messageType: 'success' | 'error' = 'error';
 
   constructor(
     private authService: AuthService,
@@ -31,9 +32,15 @@ export class Login implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.authService.errorMessage$.subscribe(msg => {
+    this.authService.errorMessage$.subscribe((msg: string) => {
       if (msg) {
         this.errorMessage = msg;
+        // Se for mensagem de cadastro, mostra verde
+        if (msg.toLowerCase().includes('conta criada')) {
+          this.messageType = 'success';
+        } else {
+          this.messageType = 'error';
+        }
       }
     });
   }
