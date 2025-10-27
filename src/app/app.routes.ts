@@ -17,61 +17,75 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => Login,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
   },
   {
     path: 'register',
     loadComponent: () => Register,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
   },
   {
     path: 'resend-verification',
     loadComponent: () => ResendVerification,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
   },
   {
     path: 'forgot-password',
     loadComponent: () => ForgotPassword,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
   },
   {
-    path: 'reset-password', 
+    path: 'reset-password',
     loadComponent: () => ResetPassword,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
   },
   {
     path: 'verify-email',
     loadComponent: () => VerifyEmail,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
   },
   {
     path: 'callback',
     loadComponent: () => Callback,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
   },
-  // Rotas Protegidas (precisam de login)
   {
     path: 'demandas',
     loadComponent: () => Demandas,
     canActivate: [authGuard],
-    data: { roles: ['Administrador', 'Normal'] }
+    data: { roles: ['Administrador', 'Normal'] },
   },
   {
     path: 'cadastro-demanda',
     loadComponent: () => CadastroAtualizacao,
     canActivate: [authGuard],
-    data: { roles: ['Normal'] }
+    data: { roles: ['Normal'] },
+  },
+  {
+    path: 'editar-demanda/:id',
+    loadComponent: () => CadastroAtualizacao,
+    canActivate: [authGuard],
+    data: { roles: ['Normal'] },
+  },
+  {
+    path: 'ver-mais/:id',
+    loadComponent: () => VerMais,
+    canActivate: [authGuard],
+    data: { roles: ['Administrador', 'Normal'] },
   },
   {
     path: 'dashboard',
     loadComponent: () => Dashboard,
     canActivate: [authGuard],
-    data: { roles: ['Administrador'] }
+    data: { roles: ['Administrador'] },
   },
   {
     path: '',
     redirectTo: 'login',
-    pathMatch: 'full'
+    pathMatch: 'full',
+  },
+  {
+    path: '**',
+    redirectTo: 'login',
   },
 ];
-
