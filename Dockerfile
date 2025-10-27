@@ -8,21 +8,33 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve the application from a lightweight server
-FROM node:20-slim
-WORKDIR /app
+#FROM node:20-slim
+#WORKDIR /app
 
 # Copia os artefatos de build da stage anterior
-COPY --from=build /app/dist/timesheet-valeshop/ ./dist/timesheet-valeshop/
+#COPY --from=build /app/dist/timesheet-valeshop/ ./dist/timesheet-valeshop/
 
 # Copia package.json/lock e instala apenas as dependências de produção
-COPY --from=build /app/package*.json ./
-RUN npm install --omit=dev
+#COPY --from=build /app/package*.json ./
+#RUN npm install --omit=dev
 
 # Expõe a porta que o app vai rodar
-EXPOSE 4000
+#EXPOSE 4000
 
 # Define a variável de ambiente da porta
-ENV PORT=4000
+#ENV PORT=4000
 
 # Comando para iniciar o servidor SSR
-CMD ["node", "dist/timesheet-valeshop/server/server.mjs"]
+#CMD ["node", "dist/timesheet-valeshop/server/server.mjs"]
+
+
+FROM nginx:stable-alpine as production-stage
+
+COPY default_nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/nginx.conf
+
+
+COPY --from=build /app/dist /etc/nginx/html
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
