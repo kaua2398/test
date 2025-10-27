@@ -1,13 +1,40 @@
+# ============================
+# STAGE 1 — Build Angular app
+# ============================
 FROM node:20 AS build
+
 WORKDIR /app
+
+# Copia arquivos de configuração e instala dependências
 COPY package*.json ./
 RUN npm install -g @angular/cli && npm install
-COPY . .
-RUN ng build --configuration production
 
-FROM nginx:stable-alpine AS production
-COPY --from=build /app/dist/timesheet-valeshop/browser /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY default.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Copia o restante do projeto
+COPY . .
+
+# Gera o build de produção
+RUN npm run build
+
+# ============================
+# STAGE 2 — Node para servir (sem SSR)
+# ============================
+FROM node:20-slim AS production
+
+WORKDIR /app
+
+# Copia o build gerado
+COPY --from=build /app/dist/timesheet-valeshop/browser ./dist/timesheet-valeshop/browser
+COPY --from=build /app/package*.json ./
+
+# Instala apenas dependências essenciais
+RUN npm install --omit=dev
+
+# Exponha a porta do Angular dev server (pode ser 4200)
+EXPOSE 4200
+
+# Variável de ambiente
+ENV PORT=4200
+ENV HOST=0.0.0.0
+
+# Para ambiente DEV: usa o ng serve
+CMD ["npm", "run", "dev"]
