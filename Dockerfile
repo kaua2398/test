@@ -4,37 +4,28 @@
 FROM node:20 AS build
 
 WORKDIR /app
-
-# Copia arquivos de configuração e instala dependências
 COPY package*.json ./
 RUN npm install -g @angular/cli && npm install
-
-# Copia o restante do projeto
 COPY . .
-
-# Gera o build de produção
 RUN npm run build
 
 # ============================
-# STAGE 2 — Node para servir (sem SSR)
+# STAGE 2 — Servir com ng serve (DEV MODE)
 # ============================
-FROM node:20-slim AS production
+FROM node:20-slim AS dev
 
 WORKDIR /app
 
-# Copia o build gerado
-COPY --from=build /app/dist/timesheet-valeshop/browser ./dist/timesheet-valeshop/browser
-COPY --from=build /app/package*.json ./
+# Copia o projeto completo (não só o build, pois ng serve precisa do código-fonte)
+COPY . .
 
-# Instala apenas dependências essenciais
-RUN npm install --omit=dev
+# Instala Angular CLI e dependências
+RUN npm install -g @angular/cli && npm install
 
-# Exponha a porta do Angular dev server (pode ser 4200)
+# Expõe a porta
 EXPOSE 4200
-
-# Variável de ambiente
 ENV PORT=4200
 ENV HOST=0.0.0.0
 
-# Para ambiente DEV: usa o ng serve
+# Comando padrão
 CMD ["npm", "run", "dev"]
