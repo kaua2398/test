@@ -66,6 +66,7 @@ export class PainelService {
   registerDemand(demandData: any): Observable<any> {
     console.log("Registrando demanda com dados: ", demandData);
     const headers = this.getAuthHeaders();
+    console.log("Registrando demanda de: ", headers);
     return this.http.post(`${this.apiUrl}/demands`, demandData, { headers });
   }
 
