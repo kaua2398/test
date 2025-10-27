@@ -14,6 +14,7 @@ import { ResetPassword } from './pages/reset-password/reset-password';
 import { Callback } from './pages/callback/callback';
 
 export const routes: Routes = [
+  // 🔓 Rotas públicas
   {
     path: 'login',
     loadComponent: () => Login,
@@ -49,6 +50,8 @@ export const routes: Routes = [
     loadComponent: () => Callback,
     canActivate: [publicGuard],
   },
+
+  // 🔐 Rotas protegidas
   {
     path: 'demandas',
     loadComponent: () => Demandas,
@@ -79,11 +82,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['Administrador'] },
   },
+
+  // 🔁 Redirecionamento padrão
   {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
   },
+  // ⚠️ Rota coringa (caso acesse algo inexistente)
   {
     path: '**',
     redirectTo: 'login',
