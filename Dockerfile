@@ -1,31 +1,40 @@
-# ============================
-# STAGE 1 — Build Angular app
-# ============================
+# Stage 1: Build the application
 FROM node:20 AS build
-
 WORKDIR /app
 COPY package*.json ./
-RUN npm install -g @angular/cli && npm install
+RUN npm install
 COPY . .
+# O 'ng build' irá gerar a saída no diretório /app/dist/timesheet-valeshop
 RUN npm run build
 
-# ============================
-# STAGE 2 — Servir com ng serve (DEV MODE)
-# ============================
-FROM node:20-slim AS dev
-
+# Stage 2: Serve the application from a lightweight server
+FROM node:20-slim
 WORKDIR /app
 
-# Copia o projeto completo (não só o build, pois ng serve precisa do código-fonte)
-COPY . .
+# Copia os artefatos de build da stage anterior
+COPY --from=build /app/dist/timesheet-valeshop/ ./dist/timesheet-valeshop/
 
-# Instala Angular CLI e dependências
-RUN npm install -g @angular/cli && npm install
+# Copia package.json/lock e instala apenas as dependências de produção
+COPY --from=build /app/package*.json ./
+RUN npm install --omit=dev
 
-# Expõe a porta
-EXPOSE 4200
-ENV PORT=4200
-ENV HOST=0.0.0.0
+# Expõe a porta que o app vai rodar
+EXPOSE 4000
 
-# Comando padrão
-CMD ["npm", "run", "dev"]
+# Define a variável de ambiente da porta
+ENV PORT=4000
+
+# Comando para iniciar o servidor SSR
+CMD ["node", "dist/timesheet-valeshop/browser/server.mjs"]
+
+
+#FROM nginx:stable-alpine as production-stage
+
+#COPY default_nginx.conf /etc/nginx/conf.d/default.conf
+#COPY nginx.conf /etc/nginx/nginx.conf
+
+
+#COPY --from=build /app/dist /etc/nginx/html
+#EXPOSE 80
+
+#CMD ["nginx", "-g", "daemon off;"]
