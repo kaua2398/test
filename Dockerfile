@@ -25,7 +25,7 @@ EXPOSE 4000
 ENV PORT=4000
 
 # Comando para iniciar o servidor SSR
-CMD ["node", "dist/timesheet-valeshop/server/server.mjs"]
+CMD ["node", "dist/timesheet-valeshop/browser/server.mjs"]
 
 
 #FROM nginx:stable-alpine as production-stage
